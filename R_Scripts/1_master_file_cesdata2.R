@@ -13,17 +13,17 @@ library(car)
 ces7980
 table(ces7980$V4002)
 
-ces7980 %>% 
+ces7980 %>%
   #This variable indicates Rs who completed the 1979 survey, no panel respondents
   filter(V4002==1)->ces79
 
-ces7980 %>% 
+ces7980 %>%
   #This variable indicates Rs who completed the 1980 survey, may also havecompleted the 1979 survey; a user should check.
   filter(V4008==1)->ces80
 # Drop the `election` variable from ces80
-# This is a quirk of the election80 variable; 
+# This is a quirk of the election80 variable;
 # I'll explain another time. Trust me; it is necessary and in this order.
-ces80 %>% 
+ces80 %>%
   select(-election)->ces80
 #Remove the '80' from the duplicate ces80 variables
 # in the ces780
@@ -43,11 +43,11 @@ ces0411 %>%
 ces0411 %>%
   filter(str_detect(ces0411$survey, "PES06"))->ces06
 # Use Panel Respondents for 2008
-ces0411 %>% 
+ces0411 %>%
   filter(str_detect(ces0411$survey, "PES08"))->ces08
 
 #Use Panel respondents for 2011
-ces0411 %>% 
+ces0411 %>%
   filter(str_detect(ces0411$survey, "PES11"))->ces11
 
 #Rename variables in 2004
@@ -67,47 +67,48 @@ names(ces11)<-str_remove_all(names(ces11), "11")
 
 # List data frames
 ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19web, ces19phone, ces21)
-ces.list %>% 
+ces.list %>%
   map(., nrow)
 #Provide names for list
 names(ces.list)<-c(1965, 1968, 1972, 1974, 1979, 1980, 1984, 1988, 1993, 1997, 2000, 2004, 2006, 2008, 2011, "2015 Phone","2019 Phone", "ces19web", 2021)
 #Common variables to be selected
 #common_vars<-c('male')
 common_vars<-c('male',
-               'sector', 
+               'sector',
                'occupation',
-               'employment', 
+               'employment',
                'union_both',
                'region', 'union',
-               'degree', 
-               'quebec', 
-               'age', 
-               'religion', 
-               'vote', 
+               'degree',
+               'quebec',
+               'age',
+               'religion',
+               'vote',
                'income',
                'redistribution',
-               'market_liberalism', 
-               'immigration_rates', 
+               'market_liberalism',
+               'immigration_rates',
                'traditionalism',
-               'traditionalism2', 
+               'traditionalism2',
                'trad1', 'trad2', 'immigration_rates',
                'market1','market2',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
                'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust', 'pol_interest', 'foreign',
-               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend', 'mode', 'election')
+               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend', 'mode', 'election', 'pes19_weight_general_all', 'weight_PES Weight_PES')
 
-ces.list %>% 
+ces.list %>%
   map(., select, any_of(common_vars))%>%
   #bind_rows smushes all the data frames together, and creates a variable called election
   bind_rows()->ces
+
 #show what we have.
 glimpse(ces)
 
-#### Recodes #### 
+#### Recodes ####
 ### Region
 # quebec is dichotomous Quebec v. non-quebec
 # Create region2 which is one region variable for all of Canada
-ces %>% 
+ces %>%
   mutate(region2=case_when(
     region==1 ~ "Atlantic",
     region==2 ~ "Ontario",
@@ -116,7 +117,7 @@ ces %>%
   ))->ces
 
 # Turn region2 into factor with Quebec as reference case
-# This can be changed anytime very easily 
+# This can be changed anytime very easily
 
 ces$region2<-factor(ces$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
 levels(ces$region2)
@@ -127,22 +128,22 @@ levels(ces$region3)
 table(ces$region3)
 
 ### Female
-## Sometimes we may want to report male dichotomous variable, sometimes female. 
-ces %>% 
+## Sometimes we may want to report male dichotomous variable, sometimes female.
+ces %>%
   mutate(female=case_when(
     male==1~0,
     male==0~1
   ))->ces
 
 ## Party Vote Variables
-# This sets the other parties as 0 
+# This sets the other parties as 0
 as_factor(ces$vote)
-ces %>% 
+ces %>%
   mutate(vote2=case_when(
     vote==1~"Liberal",
     vote== 2~"Conservative",
-    vote== 3~"NDP", 
-    vote==  4~"BQ", 
+    vote== 3~"NDP",
+    vote==  4~"BQ",
     vote== 5~"Green",
     vote==  0~NA_character_
   ))->ces
@@ -187,10 +188,10 @@ ces$working_class3<-Recode(ces$occupation3, "4:5=1; 3=0; 2=0; 1=0; 6=0; else=NA"
 ces$working_class4<-Recode(ces$occupation3, "4:5=1; else=0")
 
 #Check sample sizes for occupation
-ces %>% 
-  select(occupation, occupation3, election) %>% 
-  group_by(election) %>% 
-  summarise_all(funs(sum(is.na(.))/length(.))) 
+ces %>%
+  select(occupation, occupation3, election) %>%
+  group_by(election) %>%
+  summarise_all(funs(sum(is.na(.))/length(.)))
 
 #Create Upper Class Variables variables
 
@@ -227,7 +228,7 @@ ces$`2015`<-Recode(ces$election, "2015=1; else=0")
 ces$`2019`<-Recode(ces$election, "2019=1; else=0")
 
 # Create Period Variable
-ces %>% 
+ces %>%
   mutate(`Period`=case_when(
     election>2000~1,
     election<2004~0
@@ -237,18 +238,18 @@ ces %>%
 #Flip redistribution
 ces$redistribution_reversed<-1-ces$redistribution
 #Start with data frame
-ces %>% 
-  #Create new variable called economic 
+ces %>%
+  #Create new variable called economic
   #It is defined as the average (mean) of market1, market2 and redistribution_reviersed; missing values ignored
-  mutate(economic=rowMeans(select(., c("market1", "market2", "redistribution_reversed"))), na.rm=T) %>% 
-  #Select those variables 
-  select(market1, market2, election, redistribution_reversed,economic) %>% 
+  mutate(economic=rowMeans(select(., c("market1", "market2", "redistribution_reversed"))), na.rm=T) %>%
+  #Select those variables
+  select(market1, market2, election, redistribution_reversed,economic) %>%
   #Filter post 2004 to examine.
   filter(election>2000)
 
 #Repeat and store
-ces %>% 
-  #Create new variable called economic 
+ces %>%
+  #Create new variable called economic
   #It is defined as the average (mean) of market1, market2 and redistribution_reviersed; missing values ignored
   mutate(economic=rowMeans(select(., c("market1", "market2", "redistribution_reversed"))), na.rm=T) ->ces
 
@@ -256,17 +257,17 @@ ces %>%
 ### Socio-cultural Views ###
 
 #Start with data frame
-ces %>% 
-  #Create new variable called social 
+ces %>%
+  #Create new variable called social
   #It is defined as the average (mean) of trad1, trad2 and immigration; missing values ignored
-  mutate(social=rowMeans(select(., c("trad1", "trad2", "immigration_rates")), na.rm=T))  %>% 
-  #Select those variables 
-  select(trad1, trad2, election, immigration_rates, social) %>% 
+  mutate(social=rowMeans(select(., c("trad1", "trad2", "immigration_rates")), na.rm=T))  %>%
+  #Select those variables
+  select(trad1, trad2, election, immigration_rates, social) %>%
   #Filter post 2004 to examine.
   filter(election>2000)
 
-ces %>% 
-  #Create new variable called social 
+ces %>%
+  #Create new variable called social
   #It is defined as the average (mean) of trad1, trad2 and immigration; missing values ignored
   mutate(social=rowMeans(select(., c("trad1", "trad2", "immigration_rates")), na.rm=T))  ->ces
 
@@ -319,15 +320,15 @@ table(ces$election, ces$union)
 
 table(ces$income, ces$income_tertile)
 table(ces$income2, ces$income_tertile)
-ces %>% 
-  filter(income2==3&income_tertile==3) %>% 
+ces %>%
+  filter(income2==3&income_tertile==3) %>%
 select(election) #Note there are some suspicious values here
 # There are 489 people who are in the third simon quintile and the top tertile
 #I checked and they are *all* in 2004 and 2006 and they are just boundary edge cases. I used the 2004 SLID to etimate terciles for 2004, but I'm waiting on terciles
 # for the 20006 census data; this may change. But if you look at the proportions, they overwhelming majority of 3 quintiles are in the second tercile.
 
-ces %>% 
-  filter(income2==3&income_tertile==3) %>% 
+ces %>%
+  filter(income2==3&income_tertile==3) %>%
   select(election)
 #Create tertles
 table(ces$income)
@@ -351,8 +352,3 @@ table(ces$vote3, ces$election)
 ces21$occupation3
 
 #Test of master file cesdata2
-ces %>% 
-  filter(election>2000&election<2012) %>% 
-  select(election, occupation3, occupation) %>% 
-  count(election, occupation3) %>% as_factor() %>% 
-  view()
