@@ -66,7 +66,7 @@ names(ces08)<-str_remove_all(names(ces08), "08")
 names(ces11)<-str_remove_all(names(ces11), "11")
 
 # List data frames
-ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19web, ces19phone, ces21)
+ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19phone,ces19web,  ces21)
 ces.list %>%
   map(., nrow)
 #Provide names for list
