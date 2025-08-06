@@ -361,3 +361,12 @@ ces %>%
   filter(election==2019) %>%
   group_by(mode, occupation2) %>%
   count()
+
+# Fix levels in ces$occupation2
+
+ces$occupation2<-Recode(ces$occupation2, "'Working_Class'='Working Class';
+       'Routine_Nonmanual'='Routine Non-manual';
+       'Managers'='Managers';
+       'Professionals'='Professionals'", levels=c("Working Class",
+                                                 "Routine Non-manual",
+                                                 "Professionals", "Managers"))
