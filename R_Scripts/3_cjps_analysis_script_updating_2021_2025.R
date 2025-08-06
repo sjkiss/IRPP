@@ -1,4 +1,4 @@
-ces$vote2
+
 #### Andersen Replication and extension
 library(nnet)
 library(ggeffects)
@@ -22,6 +22,7 @@ ces %>%
 qc_models_2021$region<-rep("Quebec", nrow(qc_models_2021))
 roc_models_2021$region<-rep("Rest of Canada", nrow(roc_models_2021))
 qc_models_2021
+ces$occupation2
 #Visualize
 qc_models_2021 %>%
   #bind the two sets of models together
@@ -38,8 +39,9 @@ qc_models_2021 %>%
   ggplot(., aes(x=Election, y=predicted, group=Class, linetype=Class))+
   geom_line()+
   facet_grid(region~response.level)+
-  scale_linetype_manual(values=c(2,3,6, 1))+theme_minimal()+
-  theme(axis.text.x = element_text(angle = 90))+labs(y="Predicted Probability", title=str_wrap("Effect of Social Class on Vote, 1965-2019, without Self-Employed", 35))
+  scale_linetype_manual(values=c(1,2,3,6))+theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90))+
+  labs(y="Predicted Probability", title=str_wrap("Effect of Social Class on Vote, 1965-2021, without Self-Employed", 35))
 ggsave(filename=here("Plots", "canada_class_voting_1965_2021.png"), dpi=300,width=12, height=4)
 
 # #### This section addresses the concerns about the interaction between class and time
@@ -327,10 +329,11 @@ ces %>%
   filter(election>1988 &election!=2000) %>%
   group_by(election, Group, Variable) %>%
   summarize(Average=mean(Score, na.rm=T), sd=sd(Score, na.rm=T), n=n(), se=sd/sqrt(n)) %>%
-  ggplot(., aes(y=election, x=Average, group=Variable, col=`Group`))+geom_point()+
+  ggplot(., aes(y=as.factor(election), x=Average, group=Variable, col=`Group`))+geom_point()+
     facet_wrap(~fct_relevel(Variable, "Immigration Rates","Moral Traditionalism", "Market Liberalism", "Redistribution"), nrow=2)+
   theme(axis.text.x=element_text(angle=90))+scale_color_discrete(type=c("grey", "black"))+
-  scale_y_discrete(limits=rev)+geom_errorbar(aes(xmin=Average-(1.96*se),xmax=Average+(1.96*se) ), width=0)+
+  scale_y_discrete(limits=rev)+
+    geom_errorbar(aes(xmin=Average-(1.96*se),xmax=Average+(1.96*se) ), width=0)+
   geom_vline(xintercept=0.5, linetype=2)+labs(y="Election", x="Average")
 ggsave(here("Plots", "average_scores_raw_class_population_with_errorbars.png"), width=6, height=4)
 
