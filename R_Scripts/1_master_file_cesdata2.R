@@ -180,7 +180,10 @@ ces$no_religion<-Recode(ces$religion, "0=1; 1:3=0; NA=NA")
 # Occupation 2 and 4 collapse skilled and Unskilled
 ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
 ces$occupation2<-fct_relevel(ces$occupation2, "Managers", "Professionals", "Routine_Nonmanual", 'Working_Class')
-ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals','Self-Employed', 'Routine_Nonmanual'))
+ces$occupation4<-Recode(as_factor(ces$occupation3),"'Skilled'='Working Class' ;
+       'Unskilled'='Working Class' ;
+       'Professional'='Professional' ; 'Managers'='Manager'; 'Self_employed'='Self-Employed';'Routine_Nonmanual'='Routine Non-manual'",
+                        levels=c("Working Class", "Routine Non-manual", "Self-Employed", "Professional", "Manager"))
 # Working Class variables (3 and 4 include self-employed; 2 and 4 are dichotomous where everyone else is set to 0)
 ces$working_class<-Recode(ces$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
 ces$working_class2<-Recode(ces$occupation, "4:5=1; else=0")
@@ -350,5 +353,11 @@ table(ces$turnout, ces$election)
 table(ces$vote, ces$election)
 table(ces$vote3, ces$election)
 ces21$occupation3
+ces$occupation3
 
 #Test of master file cesdata2
+
+ces %>%
+  filter(election==2019) %>%
+  group_by(mode, occupation2) %>%
+  count()
